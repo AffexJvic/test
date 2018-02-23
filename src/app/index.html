@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="zanshaApp">
+  <head>
+ 
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Zansha Core</title>
+
+    <script type="text/javascript">
+      function HTMLConsole(options) {
+        this.ele = $(options.selector);
+        this.data = [];
+        var _this = this;
+        var data;
+        if (data = localStorage.getItem("consoleData")) {
+          data = JSON.parse(data);
+          data.forEach(function (d) {
+            _this.dumpCallback(d.error ? d : null, d.error ? null : d);
+          });
+        }
+      }
+  
+      HTMLConsole.prototype.clear = function () {
+        this.data = [];
+        this.ele.html('');
+        localStorage.removeItem("consoleData");
+      };
+  
+      HTMLConsole.prototype.dumpCallback = function (err, data) {
+        if (err) {
+          return this.dump(err, 'error');
+        }
+        if (data && data.error) {
+          return this.dump(data, 'error');
+        }
+        if (data) {
+          return this.dump(data);
+        }
+      };
+  
+      HTMLConsole.prototype.dump = function (o, className) {
+        className = className || '';
+  
+        this.data.push(o);
+        localStorage.setItem("consoleData", JSON.stringify(this.data));
+  
+        function replacer(key, value) {
+          if (typeof value === 'object') {
+            return value;
+          }
+          return '<span>' + value + '</span>';
+        }
+  
+        var plainStr = JSON.stringify(o).substr(0, 50);
+        var str = JSON.stringify(o, replacer, 4);
+        var html = '<details class="' + className + '">' +
+          '<summary>' + plainStr + '</summary>' +
+          '<p>' + str + '</p>' +
+          '</details>';
+  
+        this.ele.append(html);
+  
+        this.ele.find('details').removeAttr('open');
+        this.ele.find('details').last().attr('open', true);
+      };
+    </script>
+  </head>
+
+  </head>
+<body>
+    <base href="/">
+  <app-root></app-root>
+
+</body>
+</html>
